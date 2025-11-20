@@ -26,15 +26,15 @@ An intelligent, autonomous QA agent capable of constructing a "testing brain" fr
 1.  **Clone or open the repo** and ensure you are on Python 3.10.
 2.  **Install dependencies**:
     ```powershell
-    C:/Users/mrrr7/AppData/Local/Programs/Python/Python310/python.exe -m pip install -r requirements.txt
+    pip install -r requirements.txt
     ```
 3.  **Provide a Gemini API key** either via the UI sidebar or by exporting an env var:
     ```powershell
-    $env:GOOGLE_API_KEY="AIza..."
+    $env:GOOGLE_API_KEY="..."
     ```
 4.  *(Optional)* Use the helper script to list enabled Gemini models for your key:
     ```powershell
-    C:/Users/mrrr7/AppData/Local/Programs/Python/Python310/python.exe scripts/list_models.py
+    list_models.py
     ```
 
 ## How to Run
@@ -42,14 +42,14 @@ An intelligent, autonomous QA agent capable of constructing a "testing brain" fr
 1.  **Start the Backend**:
     Open a terminal and run:
     ```powershell
-    C:/Users/mrrr7/AppData/Local/Programs/Python/Python310/python.exe -m backend.app
+    python.exe -m backend.app
     ```
     The API will start at `http://localhost:8000`.
 
 2.  **Start the Frontend**:
     Open a new terminal and run:
     ```powershell
-    C:/Users/mrrr7/AppData/Local/Programs/Python/Python310/python.exe -m streamlit run frontend/app.py
+    streamlit run frontend/app.py
     ```
     The UI will open in your browser at `http://localhost:8501`.
 
@@ -97,44 +97,10 @@ BACKEND_ALLOWED_ORIGINS=https://my-streamlit-app.onrender.com
 
 The backend exposes a `/health` endpoint for quick verification after deploy.
 
-## Push to GitHub (Repo: https://github.com/deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation)
-
-If you want to upload your local code to that GitHub repo, use one of the methods below. Replace <USERNAME> and <TOKEN> accordingly.
-
 Option A — HTTPS (recommended with a token):
-```powershell
-git init
-git add .
-git commit -m "Initial commit: Autonomous QA Agent"
-git branch -M main
-git remote add origin https://github.com/deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation.git
-# Push — will prompt for credentials unless you embed PAT (NOT recommended). To use PAT:
-# git push https://<USERNAME>:<TOKEN>@github.com/deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation.git main
-git push -u origin main
-```
-
 Option B — SSH (recommended if you use an SSH key):
-```powershell
-git init
-git add .
-git commit -m "Initial commit: Autonomous QA Agent"
-git remote add origin git@github.com:deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation.git
-git branch -M main
-git push -u origin main
-```
-
 Option C — Create/Push using the GitHub CLI (gh):
-```powershell
-gh auth login
-gh repo set-default deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation
-git init
-git add .
-git commit -m "Initial commit: Autonomous QA Agent"
-git branch -M main
-git remote add origin https://github.com/deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation.git
-gh repo sync
-git push -u origin main
-```
+
 
 Note: if the remote repo already contains content, you can either pull first or force push (not recommended for collaborative repos). Use:
 ```powershell
