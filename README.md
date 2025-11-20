@@ -128,9 +128,6 @@ git push origin main
 
 Feel free to replace these with your own documents before rebuilding the knowledge base.
 
-## Demo Video
-
-The 5–10 minute walkthrough (upload → ingest → test cases → script) will be added separately per the assignment instructions.
 
 ## Troubleshooting
 
