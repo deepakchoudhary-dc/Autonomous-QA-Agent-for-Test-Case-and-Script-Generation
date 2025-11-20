@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 # Configuration
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Autonomous QA Agent", layout="wide")
 st.markdown(
@@ -32,10 +32,16 @@ st.markdown("Generate Test Cases and Selenium Scripts from Documentation")
 with st.sidebar:
     st.header("Configuration")
     api_key = st.text_input("Google Gemini API Key", type="password")
+    st.markdown(f"**Backend URL:** `{BACKEND_URL}`")
+    # Allow quick override from the sidebar during runtime
+    override = st.text_input("Override Backend URL (optional)", value="")
+    if override.strip():
+        BACKEND_URL = override.strip()
+        st.markdown(f"Using overridden backend URL: `{BACKEND_URL}`")
     if api_key:
         st.session_state['api_key'] = api_key
     
-    st.info("Ensure the Backend API is running on port 8000.")
+    st.info("Ensure the Backend API is reachable (set `BACKEND_URL` env var on Render to your backend service).")
 
 # Tabs
 tab1, tab2, tab3 = st.tabs(["📂 Knowledge Base", "🧪 Test Case Generation", "📜 Script Generation"])
@@ -78,9 +84,9 @@ with tab1:
 
         with st.spinner("Uploading and Ingesting..."):
             try:
-                upload_response = requests.post(f"{BACKEND_URL}/upload-documents", files=files_to_send)
+                upload_response = requests.post(f"{BACKEND_URL}/upload-documents", files=files_to_send, timeout=60)
                 if upload_response.status_code == 200:
-                    build_response = requests.post(f"{BACKEND_URL}/build-knowledge-base")
+                    build_response = requests.post(f"{BACKEND_URL}/build-knowledge-base", timeout=120)
                     if build_response.status_code == 200:
                         st.success(f"Knowledge Base Built! {build_response.json().get('chunks_processed')} chunks processed.")
                     else:
@@ -103,7 +109,7 @@ with tab2:
             
         with st.spinner("Analyzing Knowledge Base..."):
             try:
-                response = requests.post(f"{BACKEND_URL}/generate-test-cases", json={"query": query}, headers=headers)
+                response = requests.post(f"{BACKEND_URL}/generate-test-cases", json={"query": query}, headers=headers, timeout=120)
                 if response.status_code == 200:
                     data = response.json()
                     st.session_state['test_plan'] = data
@@ -162,7 +168,7 @@ with tab3:
                     payload = {
                         "test_case": selected_test_case
                     }
-                    response = requests.post(f"{BACKEND_URL}/generate-script", json=payload, headers=headers)
+                    response = requests.post(f"{BACKEND_URL}/generate-script", json=payload, headers=headers, timeout=120)
                     
                     if response.status_code == 200:
                         script_code = response.json().get("script_code")
