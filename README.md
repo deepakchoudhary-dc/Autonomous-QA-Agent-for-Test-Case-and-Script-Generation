@@ -53,6 +53,50 @@ An intelligent, autonomous QA agent capable of constructing a "testing brain" fr
     ```
     The UI will open in your browser at `http://localhost:8501`.
 
+## Deploy on Render
+
+### FastAPI Backend (Web Service)
+1.  Create a **Python Web Service** that points to this repo.
+2.  **Build command** (Render fills this automatically):
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Start command** (requires `gunicorn`, already listed in `requirements.txt`):
+    ```bash
+    gunicorn -k uvicorn.workers.UvicornWorker backend.app:app --bind 0.0.0.0:$PORT --workers 2
+    ```
+4.  Set env vars under *Environment* → *Secret Files / Variables*:
+    - `GOOGLE_API_KEY=<your key>`
+    - (Optional) `CHROMA_PERSIST_DIR=/opt/render/project/.chroma`
+5.  Choose a **Disk** (1–5 GB) if you want the vector store to persist between deploys. Otherwise it will rebuild per deploy.
+
+### Streamlit Frontend (Second Web Service)
+1.  Create another Python Web Service (or a Static Site that shells into Streamlit) referencing the same repo.
+2.  **Build command**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Start command**:
+    ```bash
+    streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0
+    ```
+4.  Under *Environment*, point `BACKEND_URL` to the backend Render URL (e.g., `https://qa-agent-backend.onrender.com`).
+
+### Validation Checklist
+* Confirm both services show an open port in the Render dashboard after deploy.
+* Hit the backend `/health` endpoint (or `/docs`) to verify FastAPI is responding before hooking the UI.
+* If deploy fails, inspect the **Logs** tab—most issues stem from missing packages or incorrect start commands.
+
+### CORS / Frontend Integration
+Set `BACKEND_ALLOWED_ORIGINS` on your backend service to control which origins can access the API. For a Streamlit frontend hosted on Render, set this to the Streamlit service domain (for example `https://my-streamlit-app.onrender.com`). For quick testing you can set `*`, but it's not recommended for production.
+
+Example env var value for Render:
+```
+BACKEND_ALLOWED_ORIGINS=https://my-streamlit-app.onrender.com
+```
+
+The backend exposes a `/health` endpoint for quick verification after deploy.
+
 ## Push to GitHub (Repo: https://github.com/deepakchoudhary-dc/Autonomous-QA-Agent-for-Test-Case-and-Script-Generation)
 
 If you want to upload your local code to that GitHub repo, use one of the methods below. Replace <USERNAME> and <TOKEN> accordingly.

@@ -2,10 +2,26 @@ import os
 import shutil
 from typing import List, Optional
 from fastapi import FastAPI, UploadFile, File, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 from backend.rag_engine import RAGEngine
 from backend.models import TestCaseRequest, TestPlan, SeleniumScriptRequest, SeleniumScriptResponse
 
 app = FastAPI(title="Autonomous QA Agent API")
+
+# Configure CORS from environment variable (comma-separated origins)
+allowed = os.environ.get("BACKEND_ALLOWED_ORIGINS", "*")
+if allowed.strip() == "*":
+    origins = ["*"]
+else:
+    origins = [o.strip() for o in allowed.split(",") if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "data/uploads"
 HTML_EXTENSIONS = (".html", ".htm")
@@ -68,6 +84,11 @@ async def generate_script(request: SeleniumScriptRequest, x_api_key: Optional[st
         return SeleniumScriptResponse(script_code=script)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     import uvicorn
