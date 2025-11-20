@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+streamlit
+langchain
+langchain-community
+langchain-chroma
+chromadb
+sentence-transformers
+beautifulsoup4
+selenium
+python-multipart
+requests
+pydantic
+langchain-google-genai
+tiktoken
+unstructured
+markdown

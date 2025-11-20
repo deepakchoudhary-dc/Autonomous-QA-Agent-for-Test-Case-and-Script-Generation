@@ -1,0 +1,18 @@
+UI/UX Guidelines for Checkout Page
+
+1. Color Scheme
+   - Primary Button (Pay Now): Green (#008000 or similar).
+   - Secondary Buttons (Add to Cart, Apply): Default browser style or neutral.
+   - Error Messages: Red text, displayed inline below the invalid field.
+   - Success Messages: Green text, bold.
+
+2. Form Validation
+   - Name: Required field.
+   - Email: Required field, must contain '@'.
+   - Address: Required field.
+   - Validation should trigger on 'Submit' (Pay Now click).
+
+3. Layout
+   - Products list at the top.
+   - Cart summary in the middle or side.
+   - Checkout form (User details, Shipping, Payment) at the bottom.

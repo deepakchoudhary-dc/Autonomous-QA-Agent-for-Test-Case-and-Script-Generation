@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Shop Checkout</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .product { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .error { color: red; font-size: 0.9em; display: none; }
+        .success { color: green; font-weight: bold; display: none; }
+        #pay-now-btn { background-color: green; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 16px; }
+        #pay-now-btn:disabled { background-color: #ccc; }
+        .summary { background-color: #f9f9f9; padding: 15px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>E-Shop Checkout</h1>
+
+    <div id="products-section">
+        <h2>Products</h2>
+        <div class="product" data-id="1">
+            <h3>Wireless Headphones</h3>
+            <p>Price: $<span class="price">100</span></p>
+            <button class="add-to-cart" onclick="addToCart('Wireless Headphones', 100)">Add to Cart</button>
+        </div>
+        <div class="product" data-id="2">
+            <h3>Smart Watch</h3>
+            <p>Price: $<span class="price">200</span></p>
+            <button class="add-to-cart" onclick="addToCart('Smart Watch', 200)">Add to Cart</button>
+        </div>
+        <div class="product" data-id="3">
+            <h3>Laptop Stand</h3>
+            <p>Price: $<span class="price">50</span></p>
+            <button class="add-to-cart" onclick="addToCart('Laptop Stand', 50)">Add to Cart</button>
+        </div>
+    </div>
+
+    <div id="cart-section" class="summary">
+        <h2>Cart Summary</h2>
+        <ul id="cart-items">
+            <!-- Items will be added here -->
+        </ul>
+        <p>Total: $<span id="total-price">0</span></p>
+        
+        <label for="discount-code">Discount Code:</label>
+        <input type="text" id="discount-code" placeholder="Enter code">
+        <button id="apply-discount" onclick="applyDiscount()">Apply</button>
+        <p id="discount-message"></p>
+    </div>
+
+    <div id="checkout-form">
+        <h2>Shipping & Payment</h2>
+        <form id="order-form" onsubmit="submitOrder(event)">
+            <h3>User Details</h3>
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+                <span class="error" id="name-error">Name is required</span>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                <span class="error" id="email-error">Invalid email format</span>
+            </div>
+            <div>
+                <label for="address">Address:</label>
+                <textarea id="address" required></textarea>
+                <span class="error" id="address-error">Address is required</span>
+            </div>
+
+            <h3>Shipping Method</h3>
+            <div>
+                <input type="radio" name="shipping" id="shipping-standard" value="standard" checked onchange="updateTotal()">
+                <label for="shipping-standard">Standard (Free)</label>
+            </div>
+            <div>
+                <input type="radio" name="shipping" id="shipping-express" value="express" onchange="updateTotal()">
+                <label for="shipping-express">Express ($10)</label>
+            </div>
+
+            <h3>Payment Method</h3>
+            <div>
+                <input type="radio" name="payment" id="payment-cc" value="cc" checked>
+                <label for="payment-cc">Credit Card</label>
+            </div>
+            <div>
+                <input type="radio" name="payment" id="payment-paypal" value="paypal">
+                <label for="payment-paypal">PayPal</label>
+            </div>
+
+            <br>
+            <button type="submit" id="pay-now-btn">Pay Now</button>
+        </form>
+        <p id="payment-success" class="success">Payment Successful!</p>
+    </div>
+
+    <script>
+        let cart = [];
+        let discountApplied = 0;
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-items');
+            list.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.name} - $${item.price}`;
+                list.appendChild(li);
+                total += item.price;
+            });
+            updateTotal(total);
+        }
+
+        function updateTotal(subtotal) {
+            if (subtotal === undefined) {
+                // Recalculate from cart
+                subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            }
+            
+            let shippingCost = document.getElementById('shipping-express').checked ? 10 : 0;
+            let total = subtotal + shippingCost;
+
+            if (discountApplied > 0) {
+                total = total * (1 - discountApplied);
+            }
+
+            document.getElementById('total-price').textContent = total.toFixed(2);
+        }
+
+        function applyDiscount() {
+            const code = document.getElementById('discount-code').value;
+            const msg = document.getElementById('discount-message');
+            if (code === 'SAVE15') {
+                discountApplied = 0.15;
+                msg.textContent = '15% Discount Applied!';
+                msg.style.color = 'green';
+            } else {
+                discountApplied = 0;
+                msg.textContent = 'Invalid Code';
+                msg.style.color = 'red';
+            }
+            updateTotal();
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            
+            let valid = true;
+            if (!name) {
+                document.getElementById('name-error').style.display = 'inline';
+                valid = false;
+            } else {
+                document.getElementById('name-error').style.display = 'none';
+            }
+
+            if (!email || !email.includes('@')) {
+                document.getElementById('email-error').style.display = 'inline';
+                valid = false;
+            } else {
+                document.getElementById('email-error').style.display = 'none';
+            }
+
+            if (!address) {
+                document.getElementById('address-error').style.display = 'inline';
+                valid = false;
+            } else {
+                document.getElementById('address-error').style.display = 'none';
+            }
+
+            if (valid) {
+                document.getElementById('payment-success').style.display = 'block';
+                document.getElementById('pay-now-btn').disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
